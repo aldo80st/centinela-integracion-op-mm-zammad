@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openproject
+  namespace: openproject
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: openproject }
+  template:
+    metadata:
+      labels: { app: openproject }
+    spec:
+      containers:
+        - name: openproject
+          image: openproject/community:12
+          env:
+            - name: OPENPROJECT_HTTPS
+              value: "false"
+            - name: DATABASE_URL
+              value: "postgresql://openproject:op_password@openproject-postgres.openproject.svc.cluster.local:5432/openproject"
+            - name: SECRET_KEY_BASE
+              value: "change_me_dev_secret"
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openproject
+  namespace: openproject
+spec:
+  type: ClusterIP
+  selector:
+    app: openproject
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: openproject-postgres
+  namespace: openproject
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: openproject-postgres }
+  template:
+    metadata:
+      labels: { app: openproject-postgres }
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:14
+          env:
+            - { name: POSTGRES_DB, value: "openproject" }
+            - { name: POSTGRES_USER, value: "openproject" }
+            - { name: POSTGRES_PASSWORD, value: "op_password" }
+          ports: [{ containerPort: 5432 }]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openproject-postgres
+  namespace: openproject
+spec:
+  type: ClusterIP
+  selector:
+    app: openproject-postgres
+  ports:
+    - name: pg
+      port: 5432
+      targetPort: 5432

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Namespace
+metadata: { name: openproject }
+---
+apiVersion: v1
+kind: Namespace
+metadata: { name: mattermost }
+---
+apiVersion: v1
+kind: Namespace
+metadata: { name: zammad }
+---
+apiVersion: v1
+kind: Namespace
+metadata: { name: integraciones }

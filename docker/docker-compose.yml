@@ -1,0 +1,95 @@
+version: "3.9"
+services:
+  # ---------- OpenProject ----------
+  openproject-postgres:
+    image: postgres:14
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${OP_POSTGRES_DB}
+      POSTGRES_USER: ${OP_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${OP_POSTGRES_PASSWORD}
+    volumes:
+      - op_pg_data:/var/lib/postgresql/data
+
+  openproject:
+    image: openproject/community:12
+    depends_on: [openproject-postgres]
+    environment:
+      OPENPROJECT_HTTPS: "false"
+      DATABASE_URL: "postgresql://${OP_POSTGRES_USER}:${OP_POSTGRES_PASSWORD}@openproject-postgres:5432/${OP_POSTGRES_DB}"
+      SECRET_KEY_BASE: "change_me_dev_secret"
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  # ---------- Mattermost ----------
+  mm-postgres:
+    image: postgres:14
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${MM_POSTGRES_DB}
+      POSTGRES_USER: ${MM_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${MM_POSTGRES_PASSWORD}
+    volumes:
+      - mm_pg_data:/var/lib/postgresql/data
+
+  mattermost:
+    image: mattermost/mattermost-team-edition:9.9
+    depends_on: [mm-postgres]
+    environment:
+      MM_CONFIG: /mattermost/config/config.json
+      MM_SQLSETTINGS_DRIVERNAME: postgres
+      MM_SQLSETTINGS_DATASOURCE: "postgres://${MM_POSTGRES_USER}:${MM_POSTGRES_PASSWORD}@mm-postgres:5432/${MM_POSTGRES_DB}?sslmode=disable&connect_timeout=10"
+      MM_SERVICESETTINGS_SITEURL: "http://localhost:8065"
+    ports:
+      - "8065:8065"
+    volumes:
+      - mm_app_data:/mattermost/data
+    restart: unless-stopped
+
+  # ---------- Zammad (simplificado c/nginx interno) ----------
+  # Nota: para búsquedas avanzadas puede requerir Elasticsearch; aquí omitimos ES para simplificar entorno local.
+  zammad-postgres:
+    image: postgres:14
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${ZAMMAD_POSTGRES_DB}
+      POSTGRES_USER: ${ZAMMAD_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${ZAMMAD_POSTGRES_PASSWORD}
+    volumes:
+      - zammad_pg_data:/var/lib/postgresql/data
+
+  zammad:
+    image: zammad/zammad:6.4.0-35
+    depends_on: [zammad-postgres]
+    environment:
+      ZAMMAD_RAILS_ELASTICSEARCH_ENABLED: "false"
+      POSTGRESQL_DB: ${ZAMMAD_POSTGRES_DB}
+      POSTGRESQL_USER: ${ZAMMAD_POSTGRES_USER}
+      POSTGRESQL_PASSWORD: ${ZAMMAD_POSTGRES_PASSWORD}
+      POSTGRESQL_HOST: zammad-postgres
+    ports:
+      - "8081:8080"
+    restart: unless-stopped
+
+  # ---------- Integrador ----------
+  integrador:
+    build:
+      context: ../integrador
+    image: integrador-op-mm-zammad:dev
+    depends_on: [openproject, mattermost]
+    environment:
+      OP_BASE_URL: ${OP_BASE_URL}
+      OP_TOKEN: ${OP_TOKEN}
+      MM_WEBHOOK_URL: ${MM_WEBHOOK_URL}
+      ZAMMAD_BASE_URL: ${ZAMMAD_BASE_URL}
+      ZAMMAD_TOKEN: ${ZAMMAD_TOKEN}
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+volumes:
+  op_pg_data: {}
+  mm_pg_data: {}
+  zammad_pg_data: {}
+  mm_app_data: {}
