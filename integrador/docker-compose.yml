@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  integrador:
+    build: .
+    image: integrador:latest
+    ports:
+      - "8000:8000"
+    environment:
+      OP_BASE_URL: ${OP_BASE_URL}
+      OP_TOKEN: ${OP_TOKEN}
+      OP_PROJECT_ID: ${OP_PROJECT_ID}
+      MM_WEBHOOK_URL: ${MM_WEBHOOK_URL}
+      API_KEY: ${API_KEY}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost}
+      REQUEST_TIMEOUT: ${REQUEST_TIMEOUT:-10}
+      REQUEST_RETRIES: ${REQUEST_RETRIES:-3}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      TZ: ${TZ:-America/Mexico_City}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped

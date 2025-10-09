@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: integrador
+  labels:
+    app.kubernetes.io/name: integrador
+    app.kubernetes.io/part-of: integrador
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  tls:
+    - hosts:
+        - integrador.example.com
+      secretName: integrador-tls
+  rules:
+    - host: integrador.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: integrador
+                port:
+                  name: http
