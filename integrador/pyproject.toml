@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=65.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "integrador"
+version = "0.1.0"
+description = "Middleware entre Zammad, OpenProject y Mattermost"
+requires-python = ">=3.11"
+authors = [{ name = "Integrador Team" }]
+dependencies = [
+    "fastapi>=0.110.0",
+    "uvicorn[standard]>=0.24.0",
+    "httpx>=0.27.0",
+    "pydantic>=2.6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-asyncio>=0.23.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["app*"]
