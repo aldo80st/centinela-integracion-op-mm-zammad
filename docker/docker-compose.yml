@@ -19,7 +19,7 @@ services:
       DATABASE_URL: "postgresql://${OP_POSTGRES_USER}:${OP_POSTGRES_PASSWORD}@openproject-postgres:5432/${OP_POSTGRES_DB}"
       SECRET_KEY_BASE: ${OP_SECRET_KEY_BASE:?Set OP_SECRET_KEY_BASE in docker/.env}
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     restart: unless-stopped
 
   # ---------- Mattermost ----------
@@ -42,7 +42,7 @@ services:
       MM_SQLSETTINGS_DATASOURCE: "postgres://${MM_POSTGRES_USER}:${MM_POSTGRES_PASSWORD}@mm-postgres:5432/${MM_POSTGRES_DB}?sslmode=disable&connect_timeout=10"
       MM_SERVICESETTINGS_SITEURL: "http://localhost:8065"
     ports:
-      - "8065:8065"
+      - "127.0.0.1:8065:8065"
     volumes:
       - mm_app_data:/mattermost/data
     restart: unless-stopped
@@ -69,7 +69,7 @@ services:
       POSTGRESQL_PASSWORD: ${ZAMMAD_POSTGRES_PASSWORD}
       POSTGRESQL_HOST: zammad-postgres
     ports:
-      - "8081:8080"
+      - "127.0.0.1:8081:8080"
     restart: unless-stopped
 
   # ---------- Integrador ----------
@@ -85,7 +85,7 @@ services:
       ZAMMAD_BASE_URL: ${ZAMMAD_BASE_URL}
       ZAMMAD_TOKEN: ${ZAMMAD_TOKEN}
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     restart: unless-stopped
 
 volumes:
