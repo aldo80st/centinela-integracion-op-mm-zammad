@@ -5,7 +5,7 @@ services:
     build: .
     image: integrador:latest
     ports:
-      - "8000:8000"
+      - "127.0.0.1:8000:8000"
     environment:
       OP_BASE_URL: ${OP_BASE_URL}
       OP_TOKEN: ${OP_TOKEN}
