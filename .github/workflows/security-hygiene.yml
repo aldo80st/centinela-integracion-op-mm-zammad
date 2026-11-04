@@ -38,7 +38,7 @@ jobs:
                     ;;
                 esac
                 ;;
-              k8s/secrets/*|*.secret.env|*/\*.secret.env|*.pem|*.p12|*.pfx|id_rsa|*/id_rsa|id_ed25519|*/id_ed25519)
+              k8s/secrets/*|*.secret.env|*.pem|*.p12|*.pfx|id_rsa|*/id_rsa|id_ed25519|*/id_ed25519)
                 echo "::error file=$path::Potential private key material must not be committed."
                 failed=1
                 ;;
