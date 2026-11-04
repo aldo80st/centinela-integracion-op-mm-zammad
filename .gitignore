@@ -22,3 +22,7 @@ __pycache__/
 .venv/
 venv/
 .DS_Store
+
+# Locally generated Kubernetes secret input files
+k8s/secrets/
+*.secret.env
