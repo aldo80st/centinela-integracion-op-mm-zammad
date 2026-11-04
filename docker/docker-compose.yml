@@ -17,7 +17,7 @@ services:
     environment:
       OPENPROJECT_HTTPS: "false"
       DATABASE_URL: "postgresql://${OP_POSTGRES_USER}:${OP_POSTGRES_PASSWORD}@openproject-postgres:5432/${OP_POSTGRES_DB}"
-      SECRET_KEY_BASE: "change_me_dev_secret"
+      SECRET_KEY_BASE: ${OP_SECRET_KEY_BASE:?Set OP_SECRET_KEY_BASE in docker/.env}
     ports:
       - "8080:8080"
     restart: unless-stopped
