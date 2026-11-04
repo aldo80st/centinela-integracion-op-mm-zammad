@@ -6,6 +6,7 @@ This project is intended for demonstrations. Treat every `*.env.example` value a
 
 - Never commit local `.env` files, private keys, access tokens, webhook URLs, or production infrastructure data.
 - Do not use the example credentials in a network-accessible deployment.
+- Docker Compose demonstration ports bind to `127.0.0.1` by default. Any external exposure must be an explicit, separately reviewed decision.
 - Do not put real secret values in GitHub issue reports, CI logs, source files, or pull-request comments.
 - Prefer runtime-injected variables and an appropriate secret manager for production.
 - Enable GitHub's secret scanning and push protection in repository security settings. A local file guard cannot replace those controls.
