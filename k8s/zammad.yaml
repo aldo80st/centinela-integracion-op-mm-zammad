@@ -18,7 +18,11 @@ spec:
             - { name: ZAMMAD_RAILS_ELASTICSEARCH_ENABLED, value: "false" }
             - { name: POSTGRESQL_DB, value: "zammad" }
             - { name: POSTGRESQL_USER, value: "zammad" }
-            - { name: POSTGRESQL_PASSWORD, value: "zammad_password" }
+            - name: POSTGRESQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: zammad-credentials
+                  key: POSTGRES_PASSWORD
             - { name: POSTGRESQL_HOST, value: "zammad-postgres.zammad.svc.cluster.local" }
           ports:
             - containerPort: 8080
@@ -57,7 +61,11 @@ spec:
           env:
             - { name: POSTGRES_DB, value: "zammad" }
             - { name: POSTGRES_USER, value: "zammad" }
-            - { name: POSTGRES_PASSWORD, value: "zammad_password" }
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: zammad-credentials
+                  key: POSTGRES_PASSWORD
           ports: [{ containerPort: 5432 }]
 ---
 apiVersion: v1
