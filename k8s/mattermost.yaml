@@ -20,7 +20,10 @@ spec:
             - name: MM_SQLSETTINGS_DRIVERNAME
               value: postgres
             - name: MM_SQLSETTINGS_DATASOURCE
-              value: "postgres://mm:mm_password@mm-postgres.mattermost.svc.cluster.local:5432/mattermost?sslmode=disable&connect_timeout=10"
+              valueFrom:
+                secretKeyRef:
+                  name: mattermost-credentials
+                  key: MM_SQLSETTINGS_DATASOURCE
             - name: MM_SERVICESETTINGS_SITEURL
               value: "http://localhost:8065"
           ports:
@@ -60,7 +63,11 @@ spec:
           env:
             - { name: POSTGRES_DB, value: "mattermost" }
             - { name: POSTGRES_USER, value: "mm" }
-            - { name: POSTGRES_PASSWORD, value: "mm_password" }
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mattermost-credentials
+                  key: POSTGRES_PASSWORD
           ports: [{ containerPort: 5432 }]
 ---
 apiVersion: v1
