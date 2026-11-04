@@ -1,0 +1,49 @@
+name: Security hygiene
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reject-tracked-local-secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Reject tracked local configuration and private keys
+        shell: bash
+        run: |
+          set -euo pipefail
+          failed=0
+          while IFS= read -r -d '' path; do
+            case "$path" in
+              .env|*/.env|.env.*|*/.env.*)
+                case "$path" in
+                  *.env.example) ;;
+                  *)
+                    echo "::error file=$path::Local environment configuration must not be committed."
+                    failed=1
+                    ;;
+                esac
+                ;;
+              *.pem|*.p12|*.pfx|id_rsa|*/id_rsa|id_ed25519|*/id_ed25519)
+                echo "::error file=$path::Potential private key material must not be committed."
+                failed=1
+                ;;
+            esac
+          done < <(git ls-files -z)
+
+          # Report filenames only; never emit matched credential values to CI logs.
+          if git grep -I -l -E '(github_pat_[A-Za-z0-9_]{20,}|ghp_[A-Za-z0-9]{30,}|glpat-[A-Za-z0-9_-]{20,}|AKIA[0-9A-Z]{16})' -- . >/tmp/secret-pattern-matches; then
+            while IFS= read -r path; do
+              echo "::error file=$path::Recognizable credential signature found."
+            done </tmp/secret-pattern-matches
+            failed=1
+          fi
+          exit "$failed"
