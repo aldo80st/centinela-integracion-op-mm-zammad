@@ -1,5 +1,8 @@
 # Integración Zammad ↔ OpenProject ↔ Mattermost (con Integrador FastAPI)
 
+> **Security / credentials:** The demo requires unique runtime credentials. Never commit `docker/.env` or Kubernetes Secret values. See [SECURITY.md](SECURITY.md) and [Kubernetes secret setup](k8s/SECRETS.md). Do not deploy unchanged sample placeholders.
+
+
 Este proyecto entrega **dos formas de despliegue** para ambiente local/laptop:
 1) **Docker Compose** (rápido para pruebas).
 2) **Kubernetes** (minikube/kind).
